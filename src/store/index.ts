@@ -13,23 +13,26 @@ export interface State {
   exception: string;
   courses: Course[];
   userCourses: Course[];
+  teachers: User[];
 }
 
 const myState: State = {
   user: {
-    name: "ljw",
-    phone: "13835210372",
+    name: "wob",
+    phone: "1111111",
     role: 0,
   },
   exception: "",
   courses: [],
   userCourses: [],
+  teachers: [],
 };
 
 const myMutations: MutationTree<State> = {
   [vxt.UPDATE_EXCEPTION]: (state, date: string) => (state.exception = date),
-  [vxt.UPDATE_USER]: (state, date: User) => (state.user = date),
+  [vxt.UPDATE_USER]: (state, data: User) => (state.user = data),
   [vxt.LIST_COURSES]: (state, data: Course[]) => (state.courses = data),
+  [vxt.LIST_TEACHERS]: (state, data: any) => (state.teachers = data),
 };
 
 const myActions: ActionTree<State, State> = {
@@ -68,12 +71,49 @@ const myActions: ActionTree<State, State> = {
       console.log(token);
       // state.isLogin = true;
     }
-    commit(vxt.UPDATE_USER, resp.data.data.user);
+    const phone1 = resp.data.data.phone;
+    const name1 = resp.data.data.name;
+    const role1 = resp.data.data.role;
+    //  console.log(phone1);
+    commit(vxt.UPDATE_USER, {
+      phone: phone1,
+      name: name1,
+      role: role1,
+    } as User);
     const role: string = resp.headers.role;
     if (role != null) {
       sessionStorage.setItem("role", role);
     }
-    router.push("/main");
+    //location.href = "/main";
+    router.push("/teacher");
+  },
+
+  // 教师管理
+  [vxt.LIST_TEACHERS]: async ({ commit }) => {
+    const resp = await axios.get("/user/findAll");
+    //console.log(resp);
+    // const { list_user } = JSON.parse(resp.data.data.list_user);
+    // console.log(resp.data.data.list_user);
+
+    commit(vxt.LIST_TEACHERS, resp.data.data.list_user);
+    //location.href = "/main";
+    //router.push("/main");
+  },
+  [vxt.DEL_USERID]: async ({ commit }, phone: string) => {
+    const resp = await axios.get("/user/del/" + phone);
+    console.log(resp);
+    const resp1 = await axios.get("/user/findAll");
+    commit(vxt.LIST_TEACHERS, resp1.data.data.list_user);
+    //location.href = "/main";
+    //router.push("/main");
+  },
+  [vxt.SAVE_USER]: async ({ commit }, user: any) => {
+    const resp = await axios.post("/user/add", user);
+    console.log(resp);
+  },
+  [vxt.UPDATE]: async ({ commit }, user: any) => {
+    const resp = await axios.post("/user/update", user);
+    console.log(resp);
   },
 };
 

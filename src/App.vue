@@ -9,6 +9,7 @@
 <script lang="ts">
 import { defineAsyncComponent, defineComponent } from "vue";
 import sidebar from "@/views/Sidebar.vue";
+
 import { mapState } from "vuex";
 const alertdialog = defineAsyncComponent(
   () => import("@/components/AlertDialog.vue")
@@ -33,7 +34,9 @@ export default defineComponent({
 }
 #router {
   border: 1px solid red;
-  flex: 1;
+  width: 70%;
+  height: 100%;
+  /* flex: 1; */
   padding: 15px;
 }
 </style>

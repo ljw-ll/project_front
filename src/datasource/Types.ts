@@ -13,3 +13,11 @@ export interface User {
   role?: number;
   courses?: Course[];
 }
+
+export interface laboratory {
+  id?: number;
+  classnum?: number;
+  mnum?: number;
+  message: string;
+  check: number;
+}

@@ -7,15 +7,21 @@ const routes: Array<RouteRecordRaw> = [
   //   name: "Home",
   //   component: Home,
   // },
-  {
-    name: "login",
-    path: "/login",
-    component: () => import("@/views/login/Login.vue"),
-  },
+
   {
     name: "main", //主页
     path: "/main",
     component: () => import("@/views/Main.vue"),
+  },
+  {
+    name: "login_user",
+    path: "/login",
+    component: () => import("@/views/login/Login.vue"),
+  },
+  {
+    name: "ListTeacher", //主页
+    path: "/teacher",
+    component: () => import("@/views/admins/teacher.vue"),
   },
   {
     name: "nomatch",

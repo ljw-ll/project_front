@@ -27,15 +27,20 @@ axios.interceptors.response.use(
     console.log(data);
 
     // 全局处理后端返回的异常信息。即，业务状态码不是200
+
     if (data.code != 200) {
       store.commit(UPDATE_EXCEPTION, data.message);
       return Promise.reject();
+    } else {
+      //  window.location.reload();
+      //store.commit(UPDATE_EXCEPTION, data.message);
     }
+
     return resp;
   },
   // 全局处理异常信息。即，http状态码不是200
   (error) => {
-    //store.commit(UPDATE_EXCEPTION, error.message);
+    store.commit(UPDATE_EXCEPTION, error.message);
     return Promise.reject();
   }
 );

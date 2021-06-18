@@ -18,3 +18,9 @@ export const GET_SHOP = "GET_SHOP";
 export const BACKEND_WELCOME = "BACKEND_WELCOME";
 export const BACKEND_LOGIN = "BACKEND_LOGIN";
 export const BACKEND_COURSES = "BACKEND_COURSES";
+
+// admin 操作 teacher 表
+export const LIST_TEACHERS = "LIST_TEACHERS";
+export const DEL_USERID = " DEL_USERID";
+export const SAVE_USER = "SAVE_USER";
+export const UPDATE = "UPDATE";
