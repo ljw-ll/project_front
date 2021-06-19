@@ -1,22 +1,22 @@
 <template>
   <div id="app">
     <span>
-      <slot>教师管理</slot>
+      <slot>课程管理</slot>
     </span>
 
     <p>{{ user.name }}</p>
-    <p>{{ user.phone }}</p>
+    <p>{{ user.phone }}/{{ user.id }}</p>
 
     <!-- <template v-for="(c, index) of teachers" :key="index">
       <p>{{ c.phone }}/{{ c.id }}/{{ c.name }}</p>
     </template>  -->
 
-    <p><button type="button" @click="findAll()">获取所有教师</button></p>
+    <p><button type="button" @click="findAll()">获取指定教师 的课程</button></p>
     <el-button @click="add()" type="primary" size="mini" style="margin: 10px 0">
       新增
     </el-button>
-    <el-table :data="teachers" style="width: 100%">
-      <el-table-column label="姓名" width="150">
+    <el-table :data="courses" style="width: 100%">
+      <el-table-column label="课程名" width="150">
         <template #default="scope">
           <el-popover effect="light" trigger="hover" placement="top">
             <!-- <template #default>
@@ -25,31 +25,37 @@
             </template> -->
             <template #reference>
               <div class="name-wrapper">
-                <el-tag size="medium">{{ scope.row.name }}</el-tag>
+                <el-tag size="medium">{{ scope.row.cname }}</el-tag>
               </div>
             </template>
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column label="电话" width="180">
+      <el-table-column label="学时" width="100">
         <template #default="scope">
           <i class="name-wrapper"></i>
-          <span style="margin-left: 10px">{{ scope.row.phone }}</span>
+          <span style="margin-left: 10px">{{ scope.row.ctime }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="id" width="220">
+      <el-table-column label="选课学生数" width="120">
+        <template #default="scope">
+          <i class="name-wrapper"></i>
+          <span style="margin-left: 10px">{{ scope.row.cnum }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="课程id" width="200">
         <template #default="scope">
           <i class="name-wrapper"></i>
           <span style="margin-left: 10px">{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-
       <el-table-column label="操作">
         <template #default="scope">
-          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">
+          <!-- <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">
             编辑
-          </el-button>
+          </el-button> -->
           <el-button
             size="mini"
             type="danger"
@@ -75,11 +81,14 @@
       <span>这是一段信息</span>
 
       <el-form :model="entity">
-        <el-form-item label="用户名" label-width="100px">
-          <el-input v-model="entity.name" />
+        <el-form-item label="课程名" label-width="100px">
+          <el-input v-model="entity.cname" />
         </el-form-item>
-        <el-form-item label="手机号" label-width="100px">
-          <el-input v-model="entity.phone" />
+        <el-form-item label="学时" label-width="100px">
+          <el-input v-model="entity.ctime" />
+        </el-form-item>
+        <el-form-item label="选课学生人数" label-width="100px">
+          <el-input v-model="entity.cnum" />
         </el-form-item>
       </el-form>
 
@@ -101,31 +110,33 @@ import { User } from "@/datasource/Types";
 import { State } from "@/store";
 import { computed, defineComponent, ref ,toRefs,reactive,watch} from "vue";
 import { Store, useStore } from "vuex";
-import { UPDATE_USER ,LIST_TEACHERS,DEL_USERID,SAVE_USER,UPDATE} from "@/store/VuexTypes";
+import { UPDATE_USER , LIST_COURSE , DEL_COURSEID, SAVE_COURSE ,UPDATE_COURSE } from "@/store/VuexTypes";
+
   import { ElMessageBox } from 'element-plus';
 
 export default defineComponent({
    setup(){
    const store=useStore();
     const user = computed(() => store.state.user);
-    const teachers=computed(()=>(store.state.teachers));
+    const courses=computed(()=>(store.state.courses));
 
     const dialogVisible=ref(false);
     const findAll=()=>{
-      store.dispatch(LIST_TEACHERS);
+      store.dispatch(LIST_COURSE,user.value.id);
     };
     const state1 = reactive({
         entity:{
-          name:'',
-          phone:'',
-          id:'',
-          role:'1'
+           id: '',
+           cname: '',
+           ctime: '',
+           cnum: '',  //课程学生人数
+           userid : computed(()=>(store.state.user.value.id)),
         }
      });
-
-     watch(teachers,(newvlaue,oldvalue)=>{
+  // this.entity.userid=computed(()=>(store.state.user.value.id));
+    /* watch(teachers,(newvlaue,oldvalue)=>{
         // findAll();   //为什么会一直请求
-     });
+     });*/
      const handleClose = (done) => {
         ElMessageBox
           .confirm('确认关闭？')
@@ -140,7 +151,7 @@ export default defineComponent({
        handleClose,
        store,
        user,
-      teachers,
+      courses,
       findAll,
       dialogVisible,
        ...toRefs(state1),
@@ -151,7 +162,13 @@ export default defineComponent({
 
     handleEdit(index, row) {
      // console.log(index, row);
-       this.entity=row;
+        this.entity={
+          id: row.id,
+           cname: row.cname,
+           ctime: row.ctime,
+           cnum: row.cnum,  //课程学生人数
+           userid : row.userid
+        };
        this.dialogVisible=true;
 
     },
@@ -159,24 +176,24 @@ export default defineComponent({
       // 基于id的删除(有精度问题)，基于phone
      // console.log(index, row);
     // console.log(row.phone);
-      this.store.dispatch(DEL_USERID,row.id);
+      this.store.dispatch(DEL_COURSEID,row.id);
 
     },
     save(){
-      if(this.entity.id==""){
-      this.store.dispatch(SAVE_USER,this.entity);
-      }
-      else {
-         this.store.dispatch(UPDATE,this.entity);
-      }
+      //this.entity.userid=this.user.value.id;
+     // console.log(this.entity);
+
+      this.store.dispatch(SAVE_COURSE,this.entity);
+
       this.dialogVisible=false;
       this.entity={
-          name:'',
-          phone:'',
-          id:'',
-          role:'1'
+          id: '',
+           cname: '',
+           ctime: '',
+           cnum: '',  //课程学生人数
+          // userid : this.user.value.id
         };
-         this.store.dispatch(LIST_TEACHERS);
+        // this.store.dispatch(LIST_COURSE);
         // window.reload();
         //  this.findAll();
     },
@@ -184,10 +201,11 @@ export default defineComponent({
         this.dialogVisible=true;
        // this.findAll();
         this.entity={
-          name:'',
-          phone:'',
-          id:'',
-          role:'1'
+          id: '',
+           cname: '',
+           ctime: '',
+           cnum: '',  //课程学生人数
+          // userid : this.user.value.id
         }
     },
 

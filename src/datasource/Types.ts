@@ -1,12 +1,13 @@
 export interface Course {
-  id?: number;
+  id?: any;
   cname?: string;
-  cTime?: string;
-  cnum?: string; //课程学生人数
+  ctime?: number;
+  cnum?: number; //课程学生人数
+  userid?: any;
 }
 
 export interface User {
-  id?: number;
+  id?: any;
   name?: string;
   phone?: string;
   password?: string;
@@ -15,9 +16,9 @@ export interface User {
 }
 
 export interface laboratory {
-  id?: number;
+  id?: any;
   classnum?: number;
   mnum?: number;
   message: string;
-  check: number;
+  laborcheck: number;
 }

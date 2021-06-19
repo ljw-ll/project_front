@@ -3,7 +3,7 @@ import router from "@/router";
 import * as vxt from "./VuexTypes";
 import axios from "@/axios";
 import { ResultVO } from "./Response";
-import { User, Course } from "@/datasource/Types";
+import { User, Course, laboratory } from "@/datasource/Types";
 import { resolveDynamicComponent } from "@vue/runtime-core";
 import _Result from "element-plus/lib/el-result";
 import { routeLocationKey } from "vue-router";
@@ -14,25 +14,29 @@ export interface State {
   courses: Course[];
   userCourses: Course[];
   teachers: User[];
+  laboratorys: laboratory[];
 }
 
 const myState: State = {
   user: {
-    name: "wob",
+    name: "",
     phone: "1111111",
     role: 0,
+    id: "",
   },
   exception: "",
   courses: [],
   userCourses: [],
   teachers: [],
+  laboratorys: [],
 };
 
 const myMutations: MutationTree<State> = {
   [vxt.UPDATE_EXCEPTION]: (state, date: string) => (state.exception = date),
   [vxt.UPDATE_USER]: (state, data: User) => (state.user = data),
-  [vxt.LIST_COURSES]: (state, data: Course[]) => (state.courses = data),
   [vxt.LIST_TEACHERS]: (state, data: any) => (state.teachers = data),
+  [vxt.LIST_LABORATORY]: (state, data: any) => (state.laboratorys = data),
+  [vxt.LIST_COURSE]: (state, data: Course[]) => (state.courses = data),
 };
 
 const myActions: ActionTree<State, State> = {
@@ -60,7 +64,7 @@ const myActions: ActionTree<State, State> = {
     commit(vxt.LIST_COURSES, resp.data.data?.courses);
   },
 
-  // 前后端联调
+  // 前后端联调 登录
   [vxt.BACKEND_LOGIN]: async ({ commit }, user: any) => {
     const resp = await axios.post("/login", user);
     console.log(resp);
@@ -74,11 +78,14 @@ const myActions: ActionTree<State, State> = {
     const phone1 = resp.data.data.phone;
     const name1 = resp.data.data.name;
     const role1 = resp.data.data.role;
+    const id1 = resp.data.data.id;
+    sessionStorage.setItem("userid", id1);
     //  console.log(phone1);
     commit(vxt.UPDATE_USER, {
       phone: phone1,
       name: name1,
       role: role1,
+      id: id1,
     } as User);
     const role: string = resp.headers.role;
     if (role != null) {
@@ -88,33 +95,110 @@ const myActions: ActionTree<State, State> = {
     router.push("/teacher");
   },
 
-  // 教师管理
+  /*
+     教师管理
+  */
   [vxt.LIST_TEACHERS]: async ({ commit }) => {
     const resp = await axios.get("/user/findAll");
     //console.log(resp);
-    // const { list_user } = JSON.parse(resp.data.data.list_user);
-    // console.log(resp.data.data.list_user);
-
     commit(vxt.LIST_TEACHERS, resp.data.data.list_user);
-    //location.href = "/main";
+
     //router.push("/main");
   },
   [vxt.DEL_USERID]: async ({ commit }, phone: string) => {
-    const resp = await axios.get("/user/del/" + phone);
-    console.log(resp);
-    const resp1 = await axios.get("/user/findAll");
-    commit(vxt.LIST_TEACHERS, resp1.data.data.list_user);
+    try {
+      const resp = await axios.get("/user/del/" + phone);
+      console.log(resp);
+      commit(vxt.LIST_TEACHERS, resp.data.data.list_user);
+    } catch (error) {
+      // eslint默认禁止空执行体。加一段注释或关闭该检测
+    }
     //location.href = "/main";
     //router.push("/main");
   },
   [vxt.SAVE_USER]: async ({ commit }, user: any) => {
+    console.log("zhixing");
     const resp = await axios.post("/user/add", user);
     console.log(resp);
+    commit(vxt.LIST_TEACHERS, resp.data.data.list_user);
   },
   [vxt.UPDATE]: async ({ commit }, user: any) => {
     const resp = await axios.post("/user/update", user);
-    console.log(resp);
+    //console.log(resp);
+    commit(vxt.LIST_TEACHERS, resp.data.data.list_user);
   },
+
+  /*
+    实验室管理
+  */
+  [vxt.LIST_LABORATORY]: async ({ commit }) => {
+    const resp = await axios.get("/laboratory/findAll");
+    //console.log(resp);
+    commit(vxt.LIST_LABORATORY, resp.data.data.list_laboratory);
+    //router.push("/main");
+  },
+
+  [vxt.DEL_LABORATORYID]: async ({ commit }, id: string) => {
+    try {
+      const resp = await axios.get("/laboratory/del/" + id);
+      console.log(resp);
+      commit(vxt.LIST_LABORATORY, resp.data.data.list_laboratory);
+    } catch (error) {
+      // eslint默认禁止空执行体。加一段注释或关闭该检测
+    }
+    //location.href = "/main";
+    //router.push("/main");
+  },
+  /* [vxt.SAVE_LABORATORY]: async ({ commit }, laboratory: laboratory) => {
+    console.log("hhhhhhhh");
+
+    const resp = await axios.post("/laboratory/add", laboratory);
+    console.log(resp);
+    commit(vxt.LIST_LABORATORY, resp.data.data.list_laboratory);
+  },*/
+  [vxt.UPDATE_LABORATORY]: async ({ commit }, user: any) => {
+    const resp = await axios.post("/laboratory/update", user);
+    //console.log(resp);
+    commit(vxt.LIST_LABORATORY, resp.data.data.list_laboratory);
+  },
+  /*
+    课程管理
+  */
+  [vxt.LIST_COURSE]: async ({ commit }, id: string) => {
+    const resp = await axios.get("/user/findDTO/" + id);
+    console.log(resp);
+    console.log(resp.data.data.list_UserDTO.courses);
+
+    commit(vxt.LIST_COURSE, resp.data.data.list_UserDTO.courses);
+
+    //router.push("/main");
+  },
+  [vxt.DEL_COURSEID]: async ({ commit }, id: string) => {
+    try {
+      const resp = await axios.get("/course/del/" + id);
+      console.log(resp);
+      commit(vxt.LIST_COURSE, resp.data.data.list_UserDTO.courses);
+    } catch (error) {
+      // eslint默认禁止空执行体。加一段注释或关闭该检测
+    }
+    //location.href = "/main";
+    //router.push("/main");
+  },
+  [vxt.SAVE_COURSE]: async ({ commit }: any, course: any) => {
+    const userid = sessionStorage.getItem("userid");
+    course.userid = userid;
+
+    console.log(course);
+
+    const resp = await axios.post("/course/add", course);
+    console.log(resp);
+    commit(vxt.LIST_COURSE, resp.data.data.list_UserDTO.courses);
+  },
+  // [vxt.UPDATE]: async ({ commit }, course: any) => {
+  //   const resp = await axios.post("/course/update", course);
+  //   //console.log(resp);
+  //   commit(vxt.LIST_COURSE, resp.data.data.list_UserDTO.courses);
+  // },
 };
 
 export default createStore({

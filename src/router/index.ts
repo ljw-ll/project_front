@@ -2,12 +2,6 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
 
 const routes: Array<RouteRecordRaw> = [
-  // {
-  //   path: "/",
-  //   name: "Home",
-  //   component: Home,
-  // },
-
   {
     name: "main", //主页
     path: "/main",
@@ -24,10 +18,20 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/views/admins/teacher.vue"),
   },
   {
-    name: "nomatch",
-    path: "/ :pathMatch( .*)*",
-    redirect: { name: "login" },
+    name: "Laboratory",
+    path: "/laboratory",
+    component: () => import("@/views/admins/laboratory.vue"),
   },
+  {
+    name: "Course",
+    path: "/course",
+    component: () => import("@/views/course.vue"),
+  },
+  // {
+  //   name: "nomatch",
+  //   path: "/ :pathMatch( .*)*",
+  //   redirect: { name: "login" },
+  // },
 ];
 
 const router = createRouter({

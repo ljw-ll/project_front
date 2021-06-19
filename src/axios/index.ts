@@ -1,7 +1,7 @@
 import { ResultVO } from "@/store/Response";
 import axios from "axios";
 import store from "@/store";
-import { UPDATE_EXCEPTION } from "@/store/VuexTypes";
+import { UPDATE_EXCEPTION, LIST_TEACHERS } from "@/store/VuexTypes";
 
 axios.defaults.baseURL = "/api";
 
@@ -24,8 +24,9 @@ axios.interceptors.response.use(
   (resp) => {
     // 从响应获取响应体对象
     const data: ResultVO = resp.data;
-    console.log(data);
-
+    //  console.log(data);
+    // console.log(data.data.list_user);
+    //  store.commit(LIST_TEACHERS, data.data.list_user);
     // 全局处理后端返回的异常信息。即，业务状态码不是200
 
     if (data.code != 200) {
