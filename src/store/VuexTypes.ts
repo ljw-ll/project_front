@@ -36,3 +36,7 @@ export const LIST_COURSE = "LIST_COURSE";
 export const DEL_COURSEID = "DEL_COURSEID";
 export const SAVE_COURSE = "SAVE_COURSE";
 export const UPDATE_COURSE = "UPDATE_COURSE";
+
+// 教师 选择 实验室
+export const LIST_TIMER = "LIST_TIMER";
+export const SAVE_TIMER = "SAVE_TIMER";
